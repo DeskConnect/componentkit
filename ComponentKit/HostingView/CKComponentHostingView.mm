@@ -40,6 +40,8 @@ struct CKComponentHostingViewInputs {
 
   CKComponentHostingViewInputs _pendingInputs;
 
+  CKComponentBoundsAnimation _boundsAnimation;
+    
   CKComponent *_component;
   BOOL _componentNeedsUpdate;
   CKUpdateMode _requestedUpdateMode;
@@ -97,7 +99,10 @@ struct CKComponentHostingViewInputs {
   if (_mountedLayout.component != _component || !CGSizeEqualToSize(_mountedLayout.size, size)) {
     _mountedLayout = CKComponentComputeLayout(_component, {size, size}, size);
   }
-  _mountedComponents = [CKMountComponentLayout(_mountedLayout, _containerView, _mountedComponents, nil) copy];
+  CKComponentBoundsAnimationApply(_boundsAnimation, ^{
+    _mountedComponents = [CKMountComponentLayout(_mountedLayout, _containerView, _mountedComponents, nil) copy];
+  }, nil);
+  _boundsAnimation = {};
 }
 
 - (CGSize)sizeThatFits:(CGSize)size
@@ -215,6 +220,7 @@ struct CKComponentHostingViewInputs {
   _pendingInputs.scopeRoot = result.scopeRoot;
   _pendingInputs.stateUpdates = {};
   _component = result.component;
+  _boundsAnimation = result.boundsAnimation;
   _componentNeedsUpdate = NO;
 }
 
