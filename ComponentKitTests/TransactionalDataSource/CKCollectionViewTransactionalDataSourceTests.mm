@@ -42,7 +42,8 @@
   self.dataSource = [[CKCollectionViewTransactionalDataSource alloc]
                      initWithCollectionView:self.mockCollectionView
                      supplementaryViewDataSource:self.mockSupplementaryViewDataSource
-                     configuration:config];
+                     configuration:config
+                     cellConfigurationFunction:NULL];
 }
 
 - (void)testSupplementaryViewDataSource
