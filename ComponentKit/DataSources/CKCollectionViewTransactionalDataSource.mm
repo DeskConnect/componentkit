@@ -28,6 +28,7 @@ CKTransactionalComponentDataSourceListener
 {
   CKTransactionalComponentDataSource *_componentDataSource;
   __weak id<CKSupplementaryViewDataSource> _supplementaryViewDataSource;
+  CKTransactionalCellConfigurationFunction _cellConfigurationFunction;
   CKTransactionalComponentDataSourceState *_currentState;
   CKComponentDataSourceAttachController *_attachController;
   NSMapTable<UICollectionViewCell *, CKTransactionalComponentDataSourceItem *> *_cellToItemMap;
@@ -40,6 +41,7 @@ CKTransactionalComponentDataSourceListener
 - (instancetype)initWithCollectionView:(UICollectionView *)collectionView
            supplementaryViewDataSource:(id<CKSupplementaryViewDataSource>)supplementaryViewDataSource
                          configuration:(CKTransactionalComponentDataSourceConfiguration *)configuration
+             cellConfigurationFunction:(CKTransactionalCellConfigurationFunction)cellConfigurationFunction
 {
   self = [super init];
   if (self) {
@@ -49,6 +51,8 @@ CKTransactionalComponentDataSourceListener
     _collectionView = collectionView;
     _collectionView.dataSource = self;
     [_collectionView registerClass:[CKCollectionViewDataSourceCell class] forCellWithReuseIdentifier:kReuseIdentifier];
+    
+    _cellConfigurationFunction = cellConfigurationFunction;
     
     _attachController = [[CKComponentDataSourceAttachController alloc] init];
     _supplementaryViewDataSource = supplementaryViewDataSource;
@@ -211,7 +215,11 @@ static NSString *const kReuseIdentifier = @"com.component_kit.collection_view_da
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
   CKCollectionViewDataSourceCell *cell = [_collectionView dequeueReusableCellWithReuseIdentifier:kReuseIdentifier forIndexPath:indexPath];
-  attachToCell(cell, [_currentState objectAtIndexPath:indexPath], _attachController, _cellToItemMap);
+  CKTransactionalComponentDataSourceItem *item = [_currentState objectAtIndexPath:indexPath];
+  if (_cellConfigurationFunction) {
+    _cellConfigurationFunction(cell, indexPath, [item model]);
+  }
+  attachToCell(cell, item, _attachController, _cellToItemMap);
   return cell;
 }
 
