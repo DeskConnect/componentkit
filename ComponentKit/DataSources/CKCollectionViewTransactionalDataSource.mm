@@ -28,6 +28,7 @@ CKTransactionalComponentDataSourceListener
 {
   CKTransactionalComponentDataSource *_componentDataSource;
   id<CKSupplementaryViewDataSource> _supplementaryViewDataSource;
+  CKTransactionalCellConfigurationFunction _cellConfigurationFunction;
   CKTransactionalComponentDataSourceState *_currentState;
   CKComponentDataSourceAttachController *_attachController;
 }
@@ -38,6 +39,7 @@ CKTransactionalComponentDataSourceListener
 - (instancetype)initWithCollectionView:(UICollectionView *)collectionView
            supplementaryViewDataSource:(id<CKSupplementaryViewDataSource>)supplementaryViewDataSource
                          configuration:(CKTransactionalComponentDataSourceConfiguration *)configuration
+             cellConfigurationFunction:(CKTransactionalCellConfigurationFunction)cellConfigurationFunction
 {
   self = [super init];
   if (self) {
@@ -47,6 +49,8 @@ CKTransactionalComponentDataSourceListener
     _collectionView = collectionView;
     _collectionView.dataSource = self;
     [_collectionView registerClass:[CKCollectionViewDataSourceCell class] forCellWithReuseIdentifier:kReuseIdentifier];
+    
+    _cellConfigurationFunction = cellConfigurationFunction;
     
     _attachController = [[CKComponentDataSourceAttachController alloc] init];
     _supplementaryViewDataSource = supplementaryViewDataSource;
@@ -173,6 +177,9 @@ static NSString *const kReuseIdentifier = @"com.component_kit.collection_view_da
 {
   CKCollectionViewDataSourceCell *cell = [_collectionView dequeueReusableCellWithReuseIdentifier:kReuseIdentifier forIndexPath:indexPath];
   CKTransactionalComponentDataSourceItem *item = [_currentState objectAtIndexPath:indexPath];
+  if (_cellConfigurationFunction) {
+    _cellConfigurationFunction(cell, indexPath, [item model]);
+  }
   [_attachController attachComponentLayout:item.layout withScopeIdentifier:item.scopeRoot.globalIdentifier withBoundsAnimation:item.boundsAnimation toView:cell.rootView];
   return cell;
 }

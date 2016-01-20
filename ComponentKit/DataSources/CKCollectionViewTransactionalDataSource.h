@@ -13,6 +13,8 @@
 #import "CKTransactionalComponentDataSource.h"
 #import "CKSupplementaryViewDataSource.h"
 
+typedef void(*CKTransactionalCellConfigurationFunction)(UICollectionViewCell *cell, NSIndexPath *indexPath, id<NSObject> model);
+
 /**
  This class is an implementation of a `UICollectionViewDataSource` that can be used along with components. For each set of changes (i.e insertion/deletion/update
  of items and/or insertion/deletion of sections) the datasource will compute asynchronously on a background thread the corresponding component trees and then
@@ -29,7 +31,8 @@
  */
 - (instancetype)initWithCollectionView:(UICollectionView *)collectionView
            supplementaryViewDataSource:(id<CKSupplementaryViewDataSource>)supplementaryViewDataSource
-                         configuration:(CKTransactionalComponentDataSourceConfiguration *)configuration NS_DESIGNATED_INITIALIZER;
+                         configuration:(CKTransactionalComponentDataSourceConfiguration *)configuration
+             cellConfigurationFunction:(CKTransactionalCellConfigurationFunction)cellConfigurationFunction NS_DESIGNATED_INITIALIZER;
 
 - (instancetype)init NS_UNAVAILABLE;
 
