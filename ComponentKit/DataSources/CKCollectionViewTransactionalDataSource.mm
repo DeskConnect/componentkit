@@ -19,6 +19,7 @@
 #import "CKComponentRootView.h"
 #import "CKComponentLayout.h"
 #import "CKComponentDataSourceAttachController.h"
+#import "CKComponentBoundsAnimation+UICollectionView.h"
 
 @interface CKCollectionViewTransactionalDataSource () <
 UICollectionViewDataSource,
@@ -83,14 +84,49 @@ static void applyChangesToCollectionView(CKTransactionalComponentDataSourceAppli
                   didModifyPreviousState:(CKTransactionalComponentDataSourceState *)previousState
                        byApplyingChanges:(CKTransactionalComponentDataSourceAppliedChanges *)changes
 {
-  [_collectionView performBatchUpdates:^{
-    applyChangesToCollectionView(changes, _collectionView);
-    // Detach all the component layouts for items being deleted
-    [self _detachComponentLayoutForRemovedItemsAtIndexPaths:[changes removedIndexPaths]
-                                                    inState:previousState];
-    // Update current state
-    _currentState = [_componentDataSource state];
-  } completion:NULL];
+  BOOL onlyUpdates = (changes.updatedIndexPaths.count && !(changes.removedIndexPaths.count ||
+                                                           changes.insertedIndexPaths.count ||
+                                                           changes.movedIndexPaths.count ||
+                                                           changes.insertedSections.count ||
+                                                           changes.removedSections.count));
+  
+  CKTransactionalComponentDataSourceState *state = [dataSource state];
+  
+  if (onlyUpdates) {
+    CKComponentBoundsAnimation boundsAnimation = {};
+    for (NSIndexPath *indexPath in changes.updatedIndexPaths) {
+      boundsAnimation = [[state objectAtIndexPath:indexPath] boundsAnimation];
+      if (boundsAnimation.duration)
+        break;
+    }
+    
+    id boundsAnimationContext = CKComponentBoundsAnimationPrepareForCollectionViewBatchUpdates(_collectionView);
+    [UIView performWithoutAnimation:^{
+      [_collectionView performBatchUpdates:^{
+        _currentState = state;
+      } completion:^(BOOL finished) {}];
+    }];
+    CKComponentBoundsAnimationApplyAfterCollectionViewBatchUpdates(boundsAnimationContext, boundsAnimation);
+    CKComponentBoundsAnimationApply(boundsAnimation, ^{
+      for (NSIndexPath *indexPath in changes.updatedIndexPaths) {
+        CKTransactionalComponentDataSourceItem *item = [state objectAtIndexPath:indexPath];
+        CKCollectionViewDataSourceCell *cell = (CKCollectionViewDataSourceCell *)[_collectionView cellForItemAtIndexPath:indexPath];
+        if (cell) {
+          [_attachController attachComponentLayout:item.layout withScopeIdentifier:item.scopeRoot.globalIdentifier withBoundsAnimation:item.boundsAnimation toView:cell.rootView];
+        }
+      }
+    }, nil);
+  } else {
+    [_collectionView performBatchUpdates:^{
+      applyChangesToCollectionView(changes, _collectionView);
+      // Detach all the component layouts for items being deleted
+      [self _detachComponentLayoutForRemovedItemsAtIndexPaths:[changes removedIndexPaths]
+                                                      inState:previousState];
+      
+      // Update current state
+      _currentState = state;
+    } completion:NULL];
+  }
 }
 
 - (void)_detachComponentLayoutForRemovedItemsAtIndexPaths:(NSSet *)removedIndexPaths
@@ -137,7 +173,7 @@ static NSString *const kReuseIdentifier = @"com.component_kit.collection_view_da
 {
   CKCollectionViewDataSourceCell *cell = [_collectionView dequeueReusableCellWithReuseIdentifier:kReuseIdentifier forIndexPath:indexPath];
   CKTransactionalComponentDataSourceItem *item = [_currentState objectAtIndexPath:indexPath];
-  [_attachController attachComponentLayout:item.layout withScopeIdentifier:item.scopeRoot.globalIdentifier toView:cell.rootView];
+  [_attachController attachComponentLayout:item.layout withScopeIdentifier:item.scopeRoot.globalIdentifier withBoundsAnimation:item.boundsAnimation toView:cell.rootView];
   return cell;
 }
 

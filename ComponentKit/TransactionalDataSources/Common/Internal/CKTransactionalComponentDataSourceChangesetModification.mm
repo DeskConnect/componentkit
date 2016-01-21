@@ -66,7 +66,7 @@
     const CKComponentLayout layout = [result.component layoutThatFits:sizeRange parentSize:sizeRange.max];
 
     [section replaceObjectAtIndex:indexPath.item withObject:
-     [[CKTransactionalComponentDataSourceItem alloc] initWithLayout:layout model:model scopeRoot:result.scopeRoot]];
+     [[CKTransactionalComponentDataSourceItem alloc] initWithLayout:layout model:model scopeRoot:result.scopeRoot boundsAnimation:result.boundsAnimation]];
   }];
 
   __block std::unordered_map<NSUInteger, std::map<NSUInteger, CKTransactionalComponentDataSourceItem *>> insertedItemsBySection;
@@ -111,7 +111,7 @@
     });
     const CKComponentLayout layout = [result.component layoutThatFits:sizeRange parentSize:sizeRange.max];
     insertedItemsBySection[indexPath.section][indexPath.item] =
-    [[CKTransactionalComponentDataSourceItem alloc] initWithLayout:layout model:model scopeRoot:result.scopeRoot];
+    [[CKTransactionalComponentDataSourceItem alloc] initWithLayout:layout model:model scopeRoot:result.scopeRoot boundsAnimation:result.boundsAnimation];
   }];
 
   for (const auto &sectionIt : insertedItemsBySection) {
