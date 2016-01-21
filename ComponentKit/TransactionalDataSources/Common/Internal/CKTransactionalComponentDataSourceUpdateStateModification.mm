@@ -56,7 +56,8 @@
         const CKComponentLayout layout = CKComponentComputeLayout(result.component, sizeRange, sizeRange.max);
         [newItems addObject:[[CKTransactionalComponentDataSourceItem alloc] initWithLayout:layout
                                                                                      model:[item model]
-                                                                                 scopeRoot:result.scopeRoot]];
+                                                                                 scopeRoot:result.scopeRoot
+                                                                           boundsAnimation:result.boundsAnimation]];
       }
     }];
     [newSections addObject:newItems];
