@@ -16,6 +16,7 @@
 - (instancetype)initWithLayout:(const CKComponentLayout &)layout
                          model:(id)model
                      scopeRoot:(CKComponentScopeRoot *)scopeRoot
-               boundsAnimation:(CKComponentBoundsAnimation)boundsAnimation;
+               boundsAnimation:(CKComponentBoundsAnimation)boundsAnimation
+                 memoizerState:(id)memoizerState;
 
 @end

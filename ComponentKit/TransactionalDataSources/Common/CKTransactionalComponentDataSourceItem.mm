@@ -24,12 +24,14 @@
                          model:(id)model
                      scopeRoot:(CKComponentScopeRoot *)scopeRoot
                boundsAnimation:(CKComponentBoundsAnimation)boundsAnimation
+                 memoizerState:(id)memoizerState
 {
   if (self = [super init]) {
     _layout = layout;
     _model = model;
     _scopeRoot = scopeRoot;
     _boundsAnimation = boundsAnimation;
+    _memoizerState = memoizerState;
   }
   return self;
 }

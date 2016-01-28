@@ -27,4 +27,7 @@ class CKComponentLayout;
 /** The bounds animation with which to apply the layout */
 @property (nonatomic, readonly) CKComponentBoundsAnimation boundsAnimation;
 
+/** The memoizer state to use when building the component tree */
+@property (nonatomic, strong, readonly) id memoizerState;
+
 @end
