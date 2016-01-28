@@ -22,6 +22,7 @@
 #import "CKComponentProvider.h"
 #import "CKComponentScopeFrame.h"
 #import "CKComponentScopeRoot.h"
+#import "CKComponentMemoizer.h"
 #import "CKComponentSubclass.h"
 
 @implementation CKTransactionalComponentDataSourceChangesetModification
@@ -60,13 +61,14 @@
     NSMutableArray *section = newSections[indexPath.section];
     CKTransactionalComponentDataSourceItem *oldItem = section[indexPath.item];
 
+    CKComponentMemoizer memoizer(oldItem.memoizerState);
     const CKBuildComponentResult result = CKBuildComponent([oldItem scopeRoot], {}, ^{
       return [componentProvider componentForModel:model context:context];
     });
     const CKComponentLayout layout = [result.component layoutThatFits:sizeRange parentSize:sizeRange.max];
 
     [section replaceObjectAtIndex:indexPath.item withObject:
-     [[CKTransactionalComponentDataSourceItem alloc] initWithLayout:layout model:model scopeRoot:result.scopeRoot boundsAnimation:result.boundsAnimation]];
+     [[CKTransactionalComponentDataSourceItem alloc] initWithLayout:layout model:model scopeRoot:result.scopeRoot boundsAnimation:result.boundsAnimation memoizerState:memoizer.nextMemoizerState()]];
   }];
 
   __block std::unordered_map<NSUInteger, std::map<NSUInteger, CKTransactionalComponentDataSourceItem *>> insertedItemsBySection;
@@ -106,12 +108,13 @@
 
   // Insert items
   [[_changeset insertedItems] enumerateKeysAndObjectsUsingBlock:^(NSIndexPath *indexPath, id model, BOOL *stop) {
+    CKComponentMemoizer memoizer(nil);
     const CKBuildComponentResult result = CKBuildComponent([CKComponentScopeRoot rootWithListener:_stateListener], {}, ^{
       return [componentProvider componentForModel:model context:context];
     });
     const CKComponentLayout layout = [result.component layoutThatFits:sizeRange parentSize:sizeRange.max];
     insertedItemsBySection[indexPath.section][indexPath.item] =
-    [[CKTransactionalComponentDataSourceItem alloc] initWithLayout:layout model:model scopeRoot:result.scopeRoot boundsAnimation:result.boundsAnimation];
+    [[CKTransactionalComponentDataSourceItem alloc] initWithLayout:layout model:model scopeRoot:result.scopeRoot boundsAnimation:result.boundsAnimation memoizerState:memoizer.nextMemoizerState()];
   }];
 
   for (const auto &sectionIt : insertedItemsBySection) {

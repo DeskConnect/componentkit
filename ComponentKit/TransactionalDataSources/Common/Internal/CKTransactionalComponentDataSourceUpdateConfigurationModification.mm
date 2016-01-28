@@ -19,6 +19,7 @@
 #import "CKComponentProvider.h"
 #import "CKComponentScopeFrame.h"
 #import "CKComponentScopeRoot.h"
+#import "CKComponentMemoizer.h"
 #import "CKComponentSubclass.h"
 
 @implementation CKTransactionalComponentDataSourceUpdateConfigurationModification
@@ -60,8 +61,10 @@
         newItem = [[CKTransactionalComponentDataSourceItem alloc] initWithLayout:layout
                                                                            model:[item model]
                                                                        scopeRoot:[item scopeRoot]
-                                                                 boundsAnimation:[item boundsAnimation]];
+                                                                 boundsAnimation:[item boundsAnimation]
+                                                                   memoizerState:[item memoizerState]];
       } else {
+        CKComponentMemoizer memoizer(item.memoizerState);
         const CKBuildComponentResult result = CKBuildComponent([item scopeRoot], {}, ^{
           return [componentProvider componentForModel:[item model] context:context];
         });
@@ -69,7 +72,8 @@
         newItem = [[CKTransactionalComponentDataSourceItem alloc] initWithLayout:layout
                                                                            model:[item model]
                                                                        scopeRoot:result.scopeRoot
-                                                                 boundsAnimation:result.boundsAnimation];
+                                                                 boundsAnimation:result.boundsAnimation
+                                                                   memoizerState:memoizer.nextMemoizerState()];
       }
 
       [newItems addObject:newItem];

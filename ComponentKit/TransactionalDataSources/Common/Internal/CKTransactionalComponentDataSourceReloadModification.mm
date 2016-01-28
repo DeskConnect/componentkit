@@ -19,6 +19,7 @@
 #import "CKComponentProvider.h"
 #import "CKComponentScopeFrame.h"
 #import "CKComponentScopeRoot.h"
+#import "CKComponentMemoizer.h"
 #import "CKComponentSubclass.h"
 
 @implementation CKTransactionalComponentDataSourceReloadModification
@@ -47,6 +48,7 @@
     NSMutableArray *newItems = [NSMutableArray array];
     [items enumerateObjectsUsingBlock:^(CKTransactionalComponentDataSourceItem *item, NSUInteger itemIdx, BOOL *itemStop) {
       [updatedIndexPaths addObject:[NSIndexPath indexPathForItem:itemIdx inSection:sectionIdx]];
+      CKComponentMemoizer memoizer(item.memoizerState);
       const CKBuildComponentResult result = CKBuildComponent([item scopeRoot], {}, ^{
         return [componentProvider componentForModel:[item model] context:context];
       });
@@ -54,7 +56,8 @@
       [newItems addObject:[[CKTransactionalComponentDataSourceItem alloc] initWithLayout:layout
                                                                                    model:[item model]
                                                                                scopeRoot:result.scopeRoot
-                                                                         boundsAnimation:result.boundsAnimation]];
+                                                                         boundsAnimation:result.boundsAnimation
+                                                                           memoizerState:memoizer.nextMemoizerState()]];
     }];
     [newSections addObject:newItems];
   }];

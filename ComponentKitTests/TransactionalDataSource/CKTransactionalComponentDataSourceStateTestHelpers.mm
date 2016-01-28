@@ -14,6 +14,7 @@
 #import "CKComponentProvider.h"
 #import "CKComponentLayout.h"
 #import "CKComponentScopeRoot.h"
+#import "CKComponentMemoizer.h"
 #import "CKComponentSubclass.h"
 #import "CKTransactionalComponentDataSource.h"
 #import "CKTransactionalComponentDataSourceChangeset.h"
@@ -23,11 +24,12 @@
 
 static CKTransactionalComponentDataSourceItem *item(CKTransactionalComponentDataSourceConfiguration *configuration, id<CKComponentStateListener> listener, id model)
 {
+  CKComponentMemoizer memoizer(nil);
   const CKBuildComponentResult result = CKBuildComponent([CKComponentScopeRoot rootWithListener:listener], {}, ^CKComponent *{
     return [configuration.componentProvider componentForModel:model context:configuration.context];
   });
   const CKComponentLayout layout = [result.component layoutThatFits:configuration.sizeRange parentSize:configuration.sizeRange.max];
-  return [[CKTransactionalComponentDataSourceItem alloc] initWithLayout:layout model:model scopeRoot:result.scopeRoot boundsAnimation:result.boundsAnimation];
+  return [[CKTransactionalComponentDataSourceItem alloc] initWithLayout:layout model:model scopeRoot:result.scopeRoot boundsAnimation:result.boundsAnimation memoizerState:memoizer.nextMemoizerState()];
 }
 
 CKTransactionalComponentDataSourceState *CKTransactionalComponentDataSourceTestState(Class<CKComponentProvider> provider,
