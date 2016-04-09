@@ -134,16 +134,20 @@
                                       mode:(CKUpdateMode)mode
 {
   CKAssertMainThread();
-  if (_pendingAsynchronousStateUpdates.empty() && _pendingSynchronousStateUpdates.empty()) {
-    dispatch_async(dispatch_get_main_queue(), ^{
-      [self _processStateUpdates];
-    });
-  }
+  BOOL process = (_pendingAsynchronousStateUpdates.empty() && _pendingSynchronousStateUpdates.empty());
 
   if (mode == CKUpdateModeAsynchronous) {
     _pendingAsynchronousStateUpdates[rootIdentifier].insert({globalIdentifier, stateUpdate});
   } else {
     _pendingSynchronousStateUpdates[rootIdentifier].insert({globalIdentifier, stateUpdate});
+  }
+  
+  if (process && mode == CKUpdateModeSynchronous) {
+    [self _processStateUpdates];
+  } else {
+    dispatch_async(dispatch_get_main_queue(), ^{
+      [self _processStateUpdates];
+    });
   }
 }
 
