@@ -15,6 +15,7 @@ PRODUCT_BUNDLE_IDENTIFIER = org.componentkit.ComponentKit
 ALWAYS_SEARCH_USER_PATHS = NO
 CLANG_ENABLE_OBJC_ARC = YES
 CLANG_ENABLE_MODULES = YES
+OTHER_CFLAGS = $(inherited) -Wall -Wextra -Wno-mismatched-tags -Wno-unused-parameter -Wno-sign-compare -Wno-missing-field-initializers
 
 ONLY_ACTIVE_ARCH[config=Debug] = YES
 GCC_OPTIMIZATION_LEVEL[config=Debug] = 0
