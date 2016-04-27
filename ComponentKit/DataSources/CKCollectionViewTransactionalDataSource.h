@@ -10,8 +10,8 @@
 
 #import <UIKit/UIKit.h>
 
-#import "CKTransactionalComponentDataSource.h"
-#import "CKSupplementaryViewDataSource.h"
+#import <ComponentKit/CKTransactionalComponentDataSource.h>
+#import <ComponentKit/CKSupplementaryViewDataSource.h>
 
 typedef void(*CKTransactionalCellConfigurationFunction)(UICollectionViewCell *cell, NSIndexPath *indexPath, id<NSObject> model);
 
