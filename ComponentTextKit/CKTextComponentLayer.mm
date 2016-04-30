@@ -74,7 +74,12 @@ static CK::TextKit::Renderer::Cache *rasterContentsCache()
       }
     }
     _renderer = renderer;
-    [self setNeedsAsyncDisplay];
+    
+    if (self.displayMode == CKAsyncLayerDisplayModeAlwaysSync) {
+      [self setNeedsDisplay];
+    } else {
+      [self setNeedsAsyncDisplay];
+    }
   }
 }
 

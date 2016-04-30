@@ -68,4 +68,5 @@
 //Text
 #import <ComponentKit/CKLabelComponent.h>
 #import <ComponentKit/CKTextComponent.h>
+#import <ComponentKit/CKTextComponentView.h>
 #import <ComponentKit/CKTextKitAttributes.h>

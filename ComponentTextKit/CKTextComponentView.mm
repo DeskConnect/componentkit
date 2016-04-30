@@ -79,6 +79,20 @@
   return [self.textLayer renderer];
 }
 
+- (void)setDisplayMode:(CKTextComponentViewDisplayMode)displayMode
+{
+  self.textLayer.displayMode = (displayMode == CKTextComponentViewDisplayModeSync ?
+                                CKAsyncLayerDisplayModeAlwaysSync :
+                                CKAsyncLayerDisplayModeDefault);
+}
+
+- (CKTextComponentViewDisplayMode)displayMode
+{
+  return (self.textLayer.displayMode == CKAsyncLayerDisplayModeAlwaysSync ?
+          CKTextComponentViewDisplayModeSync :
+          CKTextComponentViewDisplayModeAsync);
+}
+
 #pragma mark - Control Tracking
 
 - (CKTextComponentViewControlTracker *)controlTracker

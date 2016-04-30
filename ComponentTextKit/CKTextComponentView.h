@@ -19,10 +19,16 @@ enum {
   CKUIControlEventTextViewDidTapText                = CKUIControlEventTextViewDidEndHighlightingText,
 };
 
+typedef NS_ENUM(NSUInteger, CKTextComponentViewDisplayMode) {
+    CKTextComponentViewDisplayModeAsync = 0,
+    CKTextComponentViewDisplayModeSync,
+};
+
 @class CKTextKitRenderer;
 
 @interface CKTextComponentView : UIControl
 
 @property (nonatomic, strong) CKTextKitRenderer *renderer;
+@property (nonatomic) CKTextComponentViewDisplayMode displayMode;
 
 @end
