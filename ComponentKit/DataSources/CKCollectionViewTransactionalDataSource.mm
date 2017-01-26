@@ -127,8 +127,8 @@ static void applyChangesToCollectionView(UICollectionView *collectionView,
     // We only apply the bounds animation if we found one with a duration.
     // Animating the collection view is an expensive operation and should be
     // avoided when possible.
-    if (boundsAnimation.duration) {
-      id boundsAnimationContext = CKComponentBoundsAnimationPrepareForCollectionViewBatchUpdates(_collectionView);
+    id boundsAnimationContext = (boundsAnimation.duration ? CKComponentBoundsAnimationPrepareForCollectionViewBatchUpdates(_collectionView) : nil);
+    if (boundsAnimationContext) {
       [UIView performWithoutAnimation:^{
         applyUpdatedState(state);
       }];
