@@ -92,6 +92,10 @@ void CKComponentBoundsAnimationApplyAfterCollectionViewBatchUpdates(id context, 
         }
       }
     }
+    
+    if (!indexPathsToOriginalLayoutAttributes.count && !indexPathsToOriginalLayoutAttributes.count)
+      return nil;
+    
     _indexPathsToSnapshotViews = indexPathsToSnapshotViews;
     _indexPathsToOriginalLayoutAttributes = indexPathsToOriginalLayoutAttributes;
     _supplementaryElementIndexPathsToSnapshotViews = supplementaryElementIndexPathsToSnapshotViews;
