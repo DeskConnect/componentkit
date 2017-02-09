@@ -48,6 +48,53 @@
   return self;
 }
 
+- (NSIndexPath *)newIndexPathForPreviousIndexPath:(NSIndexPath *)indexPath
+{
+  if ([_removedIndexPaths containsObject:indexPath])
+    return nil;
+  
+  __block NSInteger section = indexPath.section;
+  NSInteger item = indexPath.item;
+  if ([_removedSections containsIndex:section])
+    return nil;
+
+  for (NSIndexPath *sourceIndexPath in _movedIndexPaths.keyEnumerator) {
+    if (sourceIndexPath.section == section && sourceIndexPath.item < indexPath.item) {
+      item--;
+    }
+  }
+  
+  for (NSIndexPath *removedIndexPath in _removedIndexPaths) {
+    if (removedIndexPath.section == section && removedIndexPath.item < indexPath.item) {
+      item--;
+    }
+  }
+  
+  section -= [_removedSections countOfIndexesInRange:NSMakeRange(0, section)];
+  
+  [_insertedSections enumerateIndexesUsingBlock:^(NSUInteger insertedSection, BOOL *stop) {
+    if (insertedSection <= section) {
+      section++;
+    } else {
+      *stop = YES;
+    }
+  }];
+  
+  for (NSIndexPath *insertedIndexPath in _insertedIndexPaths) {
+    if (insertedIndexPath.section == section && insertedIndexPath.item <= item) {
+      item++;
+    }
+  }
+  
+  for (NSIndexPath *destinationIndexPath in _movedIndexPaths.objectEnumerator) {
+    if (destinationIndexPath.section == section && destinationIndexPath.item <= item) {
+      item++;
+    }
+  }
+  
+  return [NSIndexPath indexPathForItem:item inSection:section];
+}
+
 - (NSString *)description
 {
   return [NSString stringWithFormat:

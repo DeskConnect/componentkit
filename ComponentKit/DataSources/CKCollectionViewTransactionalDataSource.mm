@@ -79,12 +79,15 @@ CKTransactionalComponentDataSourceListener
 static void applyChangesToCollectionView(UICollectionView *collectionView,
                                          CKComponentDataSourceAttachController *attachController,
                                          NSMapTable<UICollectionViewCell *, CKTransactionalComponentDataSourceItem *> *cellToItemMap,
-                                         CKTransactionalComponentDataSourceState *currentState,
+                                         CKTransactionalComponentDataSourceState *state,
                                          CKTransactionalComponentDataSourceAppliedChanges *changes)
 {
   [changes.updatedIndexPaths enumerateObjectsUsingBlock:^(NSIndexPath *indexPath, BOOL *stop) {
     if (CKCollectionViewDataSourceCell *cell = (CKCollectionViewDataSourceCell *) [collectionView cellForItemAtIndexPath:indexPath]) {
-      attachToCell(cell, [currentState objectAtIndexPath:indexPath], attachController, cellToItemMap);
+      NSIndexPath *newIndexPath = [changes newIndexPathForPreviousIndexPath:indexPath];
+      if (newIndexPath) {
+        attachToCell(cell, [state objectAtIndexPath:newIndexPath], attachController, cellToItemMap);
+      }
     }
   }];
   [collectionView deleteItemsAtIndexPaths:[changes.removedIndexPaths allObjects]];

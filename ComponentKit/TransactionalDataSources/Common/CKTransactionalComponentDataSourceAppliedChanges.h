@@ -32,4 +32,6 @@
                        insertedIndexPaths:(NSSet *)insertedIndexPaths
                                  userInfo:(NSDictionary *)userInfo NS_DESIGNATED_INITIALIZER;
 
+- (NSIndexPath *)newIndexPathForPreviousIndexPath:(NSIndexPath *)indexPath;
+
 @end
